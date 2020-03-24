@@ -18,7 +18,10 @@ function App() {
         socket.on('connect', () => {
             console.log("Connected to a server. Your id is " + socket.id);
         });
-        socket.on("setGameRoom", room => setGameRoom(room));
+        socket.on("setGameRoom", room => {
+            setGameRoom(room);
+            document.title = "Chat online!";
+        });
         socket.on("updateText", newText => setText(newText));
         socket.on("alone", () => alert("Your opponent left. Refresh for a new game!"));
         socket.on("playersUntilStart", amount => setPlayersUntilStart(amount));
