@@ -8,19 +8,23 @@ const server = http.createServer(app);
 
 const io = socketIo(server);
 
-let waitingClient = null;
+//--------------//
+
+const playerAmount = 4;
+
+let waitingClients = [];
 const rooms = [];
 
 io.on("connection", socket => {
     console.log("Client " + socket.id + " connected.");
-    if (waitingClient) {
-        gameIndex = rooms.length;
+    if (waitingClients.length === playerAmount-1) {
+        const gameIndex = rooms.length;
         socket.join(gameIndex);
-        waitingClient.join(gameIndex);
+        waitingClients.forEach(c => c.join(gameIndex));
         rooms.push(gameIndex);
         io.to(gameIndex).emit('setGameRoom', gameIndex);
-        waitingClient = '';
-    } else waitingClient = socket;
+        waitingClients = [];
+    } else waitingClients.push(socket);
 
     socket.on('updateText', (newText) => {
         const rooms = socket.rooms && Object.keys(socket.rooms).filter(roomName => roomName !== socket.id);
@@ -34,7 +38,8 @@ io.on("connection", socket => {
 
     socket.on("disconnect", () => {
         console.log("Client " + socket.id + " disconnected.");
-        if (waitingClient && waitingClient.id === socket.id) waitingClient = null;
+        if (waitingClients.map(c => c.id).includes(socket.id))
+            waitingClients.splice(waitingClients.map(c => c.id).indexOf(socket.id), 1);
     });
 });
 
