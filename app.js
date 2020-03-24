@@ -3,20 +3,39 @@ const http = require("http");
 const socketIo = require("socket.io");
 
 const port = process.env.PORT || 3000;
-const index = require("./routes/index");
-
 const app = express();
-app.use(index);
-
 const server = http.createServer(app);
 
 const io = socketIo(server);
 
+let waitingClient = null;
+const rooms = [];
+
 io.on("connection", socket => {
-    console.log("New client connected");
-    socket.on("disconnect", () => console.log("Client disconnected"));
+    console.log("Client " + socket.id + " connected.");
+    if (waitingClient) {
+        gameIndex = rooms.length;
+        socket.join(gameIndex);
+        waitingClient.join(gameIndex);
+        rooms.push(gameIndex);
+        io.to(gameIndex).emit('setGameRoom', gameIndex);
+        waitingClient = '';
+    } else waitingClient = socket;
+
+    socket.on('updateText', (newText) => {
+        const rooms = socket.rooms && Object.keys(socket.rooms).filter(roomName => roomName !== socket.id);
+        if (rooms) io.to(rooms[0]).emit('updateText', newText);
+    });
+
+    socket.on('disconnecting', () => {
+        const rooms = socket.rooms && Object.keys(socket.rooms).filter(roomName => roomName !== socket.id);
+        if (rooms) io.to(rooms[0]).emit('alone');
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Client " + socket.id + " disconnected.");
+        if (waitingClient && waitingClient.id === socket.id) waitingClient = null;
+    });
 });
 
 server.listen(port, () => console.log(`Server up on port ${port}`));
-
-const getApiAndEmit = "TODO"
