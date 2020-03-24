@@ -10,7 +10,7 @@ const io = socketIo(server);
 
 //--------------//
 
-const playerAmount = 4;
+const playerAmount = 2;
 
 let waitingClients = [];
 const rooms = [];
