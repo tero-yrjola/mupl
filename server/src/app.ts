@@ -1,6 +1,5 @@
-import {Socket} from "socket.io";
+import * as SocketIO from "socket.io";
 
-declare var require, process: any;
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -15,10 +14,10 @@ const io = socketIo(server);
 
 const playerAmount = 2;
 
-let waitingClients: Socket[] = [];
+let waitingClients: SocketIO.Socket[] = [];
 const rooms: number[] = [];
 
-io.on("connection", (socket: Socket) => {
+io.on("connection", (socket: SocketIO.Socket) => {
     console.log("Client " + socket.id + " connected.");
     if (waitingClients.length === playerAmount-1) {
         const gameIndex = rooms.length;
@@ -32,7 +31,7 @@ io.on("connection", (socket: Socket) => {
         waitingClients.forEach(c => io.to(c.id).emit('playersUntilStart', playerAmount - waitingClients.length))
     }
 
-    socket.on('updateText', (newText) => {
+    socket.on('updateText', (newText: string) => {
         const rooms = socket.rooms && Object.keys(socket.rooms).filter(roomName => roomName !== socket.id);
         if (rooms) io.to(rooms[0]).emit('updateText', newText);
     });

@@ -2,30 +2,29 @@ import React, { FormEvent, useState } from 'react';
 import io from 'socket.io-client';
 import './App.css';
 import Lobby from './Lobby';
-import Socket = SocketIOClient.Socket;
 
 const backend = 'mupl.herokuapp.com';
-let socket: Socket;
+let socket: SocketIOClient.Socket;
 
 function App() {
     const [text, setText] = useState('');
-    const [gameRoom, setGameRoom] = useState();
+    const [gameRoom, setGameRoom] = useState<number>();
     const [localText, setLocalText] = useState('');
     const [messageCooldown, setMessageCooldown] = useState(false);
-    const [playersUntilStart, setPlayersUntilStart] = useState();
+    const [playersUntilStart, setPlayersUntilStart] = useState<number>(0);
 
     const connect = () => {
         socket = io(backend);
         socket.on('connect', () => {
             console.log('Connected to a server. Your id is ' + socket.id);
         });
-        socket.on('setGameRoom', (room: string) => {
+        socket.on('setGameRoom', (room: number) => {
             setGameRoom(room);
             document.title = 'Chat online!';
         });
         socket.on('updateText', (newText: string) => setText(newText));
         socket.on('alone', () => alert('Your opponent left. Refresh for a new game!'));
-        socket.on('playersUntilStart', (amount: string) => setPlayersUntilStart(amount));
+        socket.on('playersUntilStart', (amount: number) => setPlayersUntilStart(amount));
         socket.on('print', (data: string) => console.log(data));
     };
 

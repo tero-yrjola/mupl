@@ -28,7 +28,9 @@ function Lobby({ connect, playersUntilStart }: LobbyProps) {
                         <p key={mode}>{mode}</p>
                     ))}
                     <h1>
-                        Waiting for {playersUntilStart} more {playersUntilStart === 1 ? 'player' : 'players'}.
+                        {playersUntilStart
+                            ? `Waiting for ${playersUntilStart} more ${playersUntilStart === 1 ? 'player' : 'players'}`
+                            : 'Loading...'}
                     </h1>
                 </div>
             ) : (
