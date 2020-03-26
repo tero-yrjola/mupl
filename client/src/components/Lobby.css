@@ -1,0 +1,30 @@
+.lobby {
+    margin: auto;
+    user-select: none;
+    max-width: 800px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.selection-container {
+    align-items: center;
+    column-count: 2;
+    column-gap: 0;
+}
+
+.player-amount-selection > div {
+    padding: 7px 0;
+}
+
+.amount-checkbox {
+    display: flex;
+    justify-content: center;
+}
+
+.amount-checkbox-label {
+    width: 10px;
+    line-height: 16px;
+}
+
