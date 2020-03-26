@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {SelectedGameModes} from "../App";
+import React, { useState } from 'react';
+import { SelectedGameModes } from '../App';
 import './Lobby.css';
 
 const gameModes = ['singleMessageChat'];
@@ -10,7 +10,7 @@ interface LobbyProps {
     playersConnected: number;
 }
 
-function Lobby({playersConnected, connect}: LobbyProps) {
+function Lobby({ playersConnected, connect }: LobbyProps) {
     const [searching, setSearching] = useState(false);
     const [selectedGameModes, setSelectedGameModes] = useState([...gameModes]);
     const [selectedPlayerCounts, setSelectedPlayerCounts] = useState([...playerCounts]);
@@ -18,14 +18,12 @@ function Lobby({playersConnected, connect}: LobbyProps) {
     const search = () => {
         if (selectedGameModes.length > 0 && selectedPlayerCounts.length > 0) {
             setSearching(true);
-            connect({playerCounts: selectedPlayerCounts, gameModes: selectedGameModes});
+            connect({ playerCounts: selectedPlayerCounts, gameModes: selectedGameModes });
         } else alert('Please pick at least one game mode and one amount of players.');
     };
 
     function deleteIfExistsAddIfNot<T>(id: T, state: T[], setState: (key: T[]) => any) {
-        state.includes(id)
-            ? setState(state.filter((i) => i !== id))
-            : setState([...state, id]);
+        state.includes(id) ? setState(state.filter((i) => i !== id)) : setState([...state, id]);
     }
 
     return searching ? (
@@ -44,32 +42,34 @@ function Lobby({playersConnected, connect}: LobbyProps) {
         <div className="lobby">
             <p className="bold">Select game modes:</p>
             <div className="selection-container game-modes">
-                {gameModes.map((mode) =>
+                {gameModes.map((mode) => (
                     <div
                         onClick={() => {
-                            deleteIfExistsAddIfNot(mode, selectedGameModes, setSelectedGameModes)
+                            deleteIfExistsAddIfNot(mode, selectedGameModes, setSelectedGameModes);
                         }}
                         key={mode}
                     >
-                        <input type="checkbox" onChange={() => null} checked={selectedGameModes.includes(mode)}/>
+                        <input type="checkbox" onChange={() => null} checked={selectedGameModes.includes(mode)} />
                         <span>{mode}</span>
                     </div>
-                )}
+                ))}
             </div>
             <p className="bold">Select the amount of players:</p>
             <div className="selection-container player-amount-selection">
-                {playerCounts.map(count =>
+                {playerCounts.map((count) => (
                     <div
                         className="amount-checkbox"
                         onClick={() => {
-                            deleteIfExistsAddIfNot(count, selectedPlayerCounts, setSelectedPlayerCounts)
+                            deleteIfExistsAddIfNot(count, selectedPlayerCounts, setSelectedPlayerCounts);
                         }}
-                        key={count}>
-                        <input type="checkBox" onChange={() => null} checked={selectedPlayerCounts.includes(count)}/>
+                        key={count}
+                    >
+                        <input type="checkBox" onChange={() => null} checked={selectedPlayerCounts.includes(count)} />
                         <div className="amount-checkbox-label">{count}</div>
-                    </div>)}
+                    </div>
+                ))}
             </div>
-            <input type="button" value="Search" onClick={search}/>
+            <input type="button" value="Search" onClick={search} />
         </div>
     );
 }
