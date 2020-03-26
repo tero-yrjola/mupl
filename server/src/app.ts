@@ -24,7 +24,7 @@ io.on("connection", (socket: SocketIO.Socket) => {
         socket.join(gameIndex.toString());
         waitingClients.forEach(c => c.join(gameIndex.toString()));
         rooms.push(gameIndex);
-        io.to(gameIndex.toString()).emit('setGameRoom', gameIndex);
+        io.to(gameIndex.toString()).emit('startGame', {mode: 'singleMessageChat', room: gameIndex});
         waitingClients = [];
     } else {
         waitingClients.push(socket);

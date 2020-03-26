@@ -1,12 +1,13 @@
 import React from 'react';
 import SMChat from './SMChat';
+import {GameProps} from "../App";
 
-export const getGameMode = (mode: string, gameRoom: number): JSX.Element => {
-    switch (mode) {
+export const getGameMode = (props: GameProps): JSX.Element => {
+    switch (props.mode) {
         case 'singleMessageChat':
-            return <SMChat gameRoom={gameRoom} />;
+            return <SMChat gameRoom={props.room} socket={props.socket}/>;
         default:
-            return <p>Gamemode {mode} not found.</p>;
+            return <p>Gamemode {props.mode} not found.</p>;
     }
 };
 

@@ -12,13 +12,16 @@ export type SelectedGameModes = {
     gameModes: string[];
 };
 
+type StartGameResponse = {
+    mode: string;
+    room: number;
+}
+
+export type GameProps = StartGameResponse & { socket: SocketIOClient.Socket }
+
 function App() {
     const [playersConnected, setPlayersConnected] = useState<number>(-1);
-    const [game, setGame] = useState<JSX.Element>();
-
-    const startGame = (mode: string, room: number) => {
-        setGame(getGameMode(mode, room));
-    };
+    const [gameProps, setGameProps] = useState<GameProps>();
 
     const connect = ({ playerCounts, gameModes }: SelectedGameModes) => {
         socket = io(backend);
@@ -26,14 +29,14 @@ function App() {
             console.log(
                 `Connected to server. Your id is ${socket.id} and you're looking for games [${gameModes}] for [${playerCounts}] players.`,
             );
-            socket.emit('lookingForGame', { playerCounts, gameModes });
+            //socket.emit('lookingForGame', { playerCounts, gameModes });
         });
         socket.on('playersUntilStart', (amount: number) => setPlayersConnected(amount));
-        socket.on('startGame', (mode: string, gameRoom: number) => startGame(mode, gameRoom));
+        socket.on('startGame', (response: StartGameResponse) => setGameProps({...response, socket}));
         socket.on('print', (data: string) => console.log(data));
     };
 
-    return <div className="App">{game ? game : <Lobby connect={connect} playersConnected={playersConnected} />}</div>;
+    return <div className="App"> {gameProps ? getGameMode(gameProps) : <Lobby connect={connect} playersConnected={playersConnected} />}</div>;
 }
 
 export default App;

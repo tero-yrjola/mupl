@@ -12,8 +12,8 @@ interface LobbyProps {
 
 function Lobby({ playersConnected, connect }: LobbyProps) {
     const [searching, setSearching] = useState(false);
-    const [selectedGameModes, setSelectedGameModes] = useState([...gameModes]);
-    const [selectedPlayerCounts, setSelectedPlayerCounts] = useState([...playerCounts]);
+    const [selectedGameModes, setSelectedGameModes] = useState<string[]>([...gameModes]);
+    const [selectedPlayerCounts, setSelectedPlayerCounts] = useState<number[]>([...playerCounts]);
 
     const search = () => {
         if (selectedGameModes.length > 0 && selectedPlayerCounts.length > 0) {

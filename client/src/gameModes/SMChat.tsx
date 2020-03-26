@@ -1,15 +1,18 @@
-import React, { FormEvent, useState } from 'react';
-
-let socket: SocketIOClient.Socket;
+import React, { FormEvent, useState, useEffect } from 'react';
 
 interface SMChatProps {
     gameRoom: number;
+    socket: SocketIOClient.Socket
 }
 
-function SMChat({ gameRoom }: SMChatProps): JSX.Element {
-    const [text] = useState('');
+function SMChat({ gameRoom, socket}: SMChatProps): JSX.Element {
+    const [text, setText] = useState('');
     const [localText, setLocalText] = useState('');
     const [messageCooldown, setMessageCooldown] = useState(false);
+
+    useEffect(() => {
+        socket.on('updateText', (text: string) => setText(text));
+    }, []);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
