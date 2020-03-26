@@ -33,7 +33,7 @@ function Lobby({ playersConnected, connect }: LobbyProps) {
                 <p key={mode}>{mode}</p>
             ))}
             <h1>
-                {playersConnected
+                {playersConnected !== -1
                     ? `Waiting for ${playersConnected} more ${playersConnected === 1 ? 'player' : 'players'}`
                     : 'Loading...'}
             </h1>
