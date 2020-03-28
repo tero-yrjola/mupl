@@ -32,14 +32,12 @@ const updatePlayersUntilStartForWaitingClients = () => {
             }
         })
     });
-    console.log(waitingClientIds);
-    console.log("readyGameType is " + readyGameType)
     let newRoomCreated = false;
     let clientsInNewRoom: string[] = [];
     [...waitingClientIds].forEach(waitingClientId => {
         // If there is a gametype ready to start, start the game for all the waiting clients in that gametype
         if (readyGameType) {
-            console.log("emitting to " + waitingClientId + "that room is " + rooms.length+1)
+            console.log("Emitting to " + waitingClientId + " that room is " + rooms.length+1);
             io.to(waitingClientId).emit('startGame', {mode: readyGameType, room: rooms.length+1});
             clientsInNewRoom.push(waitingClientId);
             removeClientFromWaiting(waitingClientId);

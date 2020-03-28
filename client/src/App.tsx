@@ -38,10 +38,7 @@ function App() {
             socket.emit('lookingForGame', {playerCounts, gameModes});
         });
         socket.on('playersUntilStart', (queueInfo: QueueInfo) => setQueueInfo(queueInfo));
-        socket.on('startGame', (response: StartGameResponse) => {setGameProps({...response, socket});
-            console.log(socket)
-            console.log(response)
-        console.log("AA NYT TAPAHTUU")});
+        socket.on('startGame', (response: StartGameResponse) => setGameProps({...response, socket}));
         socket.on('print', (data: string) => console.log(data));
     };
 
