@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { SelectedGameModes } from '../App';
+import React, {useState} from 'react';
+import {QueueInfo, SelectedGameModes} from '../App';
 import './Lobby.css';
 
 const gameModes = ['singleMessageChat'];
@@ -7,10 +7,10 @@ const playerCounts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 interface LobbyProps {
     connect: (selectedGameModes: SelectedGameModes) => void;
-    playersConnected: number;
+    queueInfo: QueueInfo | undefined;
 }
 
-function Lobby({ playersConnected, connect }: LobbyProps) {
+function Lobby({queueInfo, connect}: LobbyProps) {
     const [searching, setSearching] = useState(false);
     const [selectedGameModes, setSelectedGameModes] = useState<string[]>([...gameModes]);
     const [selectedPlayerCounts, setSelectedPlayerCounts] = useState<number[]>([...playerCounts]);
@@ -18,7 +18,7 @@ function Lobby({ playersConnected, connect }: LobbyProps) {
     const search = () => {
         if (selectedGameModes.length > 0 && selectedPlayerCounts.length > 0) {
             setSearching(true);
-            connect({ playerCounts: selectedPlayerCounts, gameModes: selectedGameModes });
+            connect({playerCounts: selectedPlayerCounts, gameModes: selectedGameModes});
         } else alert('Please pick at least one game mode and one amount of players.');
     };
 
@@ -33,9 +33,15 @@ function Lobby({ playersConnected, connect }: LobbyProps) {
                 <p key={mode}>{mode}</p>
             ))}
             <h1>
-                {playersConnected !== -1
-                    ? `Waiting for ${playersConnected} more ${playersConnected === 1 ? 'player' : 'players'}`
-                    : 'Loading...'}
+                {queueInfo && queueInfo.map && queueInfo.map(modeInfo =>
+                    <div key={modeInfo.name}>
+                        <h2>{modeInfo.name}</h2>
+                        {modeInfo.playersUntilStart.map((playerCounts =>
+                            <p key={playerCounts.amount}>
+                                {playerCounts.amount} players: {playerCounts.playersUntilStart} players missing!
+                            </p>))}
+                    </div>
+                )}
             </h1>
         </div>
     ) : (
@@ -49,7 +55,7 @@ function Lobby({ playersConnected, connect }: LobbyProps) {
                         }}
                         key={mode}
                     >
-                        <input type="checkbox" onChange={() => null} checked={selectedGameModes.includes(mode)} />
+                        <input type="checkbox" onChange={() => null} checked={selectedGameModes.includes(mode)}/>
                         <span>{mode}</span>
                     </div>
                 ))}
@@ -64,12 +70,12 @@ function Lobby({ playersConnected, connect }: LobbyProps) {
                         }}
                         key={count}
                     >
-                        <input type="checkBox" onChange={() => null} checked={selectedPlayerCounts.includes(count)} />
+                        <input type="checkBox" onChange={() => null} checked={selectedPlayerCounts.includes(count)}/>
                         <div className="amount-checkbox-label">{count}</div>
                     </div>
                 ))}
             </div>
-            <input type="button" value="Search" onClick={search} />
+            <input type="button" value="Search" onClick={search}/>
         </div>
     );
 }
