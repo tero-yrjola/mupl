@@ -4,7 +4,7 @@ import './App.css';
 import Lobby from './components/Lobby';
 import getGameMode from './gameModes';
 
-const backend = 'localhost:3001';
+let backend = process.env.NODE_ENV === 'production' ? 'mupl.herokuapp.com' : 'localhost:3001';
 let socket: SocketIOClient.Socket;
 
 export type SelectedGameModes = {
