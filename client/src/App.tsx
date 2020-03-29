@@ -25,7 +25,7 @@ type StartGameResponse = {
 export type GameProps = StartGameResponse & { socket: SocketIOClient.Socket }
 
 function App() {
-    const [queueInfo, setQueueInfo] = useState<QueueInfo | undefined>();
+    const [queueInfo, setQueueInfo] = useState<QueueInfo>([]);
     const [gameProps, setGameProps] = useState<GameProps>();
 
 
@@ -40,10 +40,13 @@ function App() {
         socket.on('playersUntilStart', (queueInfo: QueueInfo) => setQueueInfo(queueInfo));
         socket.on('startGame', (response: StartGameResponse) => setGameProps({...response, socket}));
         socket.on('print', (data: string) => console.log(data));
+        socket.on('disconnect', () => alert("Connection to the server lost."))
     };
 
-    return <div className="App"> {gameProps ? getGameMode(gameProps) :
-        <Lobby connect={connect} queueInfo={queueInfo}/>}</div>;
+    return <div className="App">
+        {gameProps ? getGameMode(gameProps) :
+        <Lobby connect={connect} queueInfo={queueInfo}/>}
+    </div>;
 }
 
 export default App;

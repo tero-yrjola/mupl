@@ -2,8 +2,8 @@ type PlayerAmounts = {
     [amountOfPlayers: string]: string[]
 };
 
-type AllGameTypes = {
-    [gameMode: string]: PlayerAmounts
+export type AllGameTypes = {
+    [gameMode: string]: PlayerAmounts;
 };
 
 export const getAllPossibleGameModes = (gameModes: string[], playerAmounts: number[]): AllGameTypes =>
@@ -23,5 +23,18 @@ export const getPlayersUntilStartForEachGame = (queuedGameTypesForEachClient: Al
             return {amount, playersUntilStart: (amount - queuedGameTypesForEachClient[mode][amount].length)}
         });
         return {name: mode, playersUntilStart}
-    })
+    });
+};
+
+export const getFirstReadyGameType = (playersUntilStartForEachGame:
+   { name: string; playersUntilStart: { amount: number; playersUntilStart: number }[] }[]) => {
+    let readyGameType = '';
+    playersUntilStartForEachGame.forEach(modeQueueInfo => {
+        modeQueueInfo.playersUntilStart.forEach((playerAmount: { playersUntilStart: number; }) => {
+            if (playerAmount.playersUntilStart === 0) {
+                readyGameType = modeQueueInfo.name
+            }
+        })
+    });
+    return readyGameType
 };
