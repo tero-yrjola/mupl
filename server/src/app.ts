@@ -1,5 +1,5 @@
 import * as SocketIO from "socket.io";
-import {getAllPossibleGameModes, getPlayersUntilStartForEachGame} from "./Helper";
+import { getAllPossibleGameModes, getFirstReadyGameType, getPlayersUntilStartForEachGame } from "./Helper";
 
 const express = require("express");
 const http = require("http");
@@ -10,6 +10,8 @@ const app = express();
 const server = http.createServer(app);
 
 const io = socketIo(server);
+
+server.listen(port, () => console.log(`Server up on port ${port}`));
 
 //--------------//
 
@@ -22,62 +24,17 @@ const clientIdQueuedGameTypes = getAllPossibleGameModes(possibleGameModes, possi
 let waitingClientIds: string[] = [];
 const rooms: string[][] = [];
 
-const updatePlayersUntilStartForWaitingClients = () => {
-    const playersUntilStartForEachGame = getPlayersUntilStartForEachGame(clientIdQueuedGameTypes);
-    let readyGameType = '';
-    playersUntilStartForEachGame.forEach(modeQueueInfo => {
-        modeQueueInfo.playersUntilStart.forEach(playerAmount => {
-            if (playerAmount.playersUntilStart === 0) {
-                readyGameType = modeQueueInfo.name
-            }
-        })
-    });
-    let newRoomCreated = false;
-    let clientsInNewRoom: string[] = [];
-    [...waitingClientIds].forEach(waitingClientId => {
-        // If there is a gametype ready to start, start the game for all the waiting clients in that gametype
-        if (readyGameType) {
-            console.log("Emitting to " + waitingClientId + " that room is " + rooms.length+1);
-            io.to(waitingClientId).emit('startGame', {mode: readyGameType, room: rooms.length+1});
-            clientsInNewRoom.push(waitingClientId);
-            removeClientFromWaiting(waitingClientId);
-            newRoomCreated = true;
-        } else {
-            io.to(waitingClientId).emit('playersUntilStart', playersUntilStartForEachGame);
-        }
-    });
-    if (newRoomCreated) {
-        rooms.push(clientsInNewRoom);
-        clientsInNewRoom = [];
-        newRoomCreated = false;
-    }
-};
-
-const removeClientFromWaiting = (socketId: string) => {
-    waitingClientIds.splice(waitingClientIds.indexOf(socketId), 1);
-    possibleGameModes.forEach(mode => {
-        possiblePlayerAmounts.forEach(amt => {
-            const indexOfDisconnectingClient = clientIdQueuedGameTypes[mode][amt].indexOf(socketId);
-            if (indexOfDisconnectingClient !== -1)
-                clientIdQueuedGameTypes[mode][amt].splice(indexOfDisconnectingClient, 1);
-        })
-    });
-};
-
 io.on("connection", (socket: SocketIO.Socket) => {
     console.log("Client " + socket.id + " connected.");
     socket.on('lookingForGame', ({playerCounts, gameModes}: { playerCounts: number[], gameModes: string[] }) => {
-        // Push the client id to each queued gametype (gametype = every queued player amount for each gamemode)
         gameModes.forEach(mode => {
             playerCounts.forEach(count => {
                 clientIdQueuedGameTypes[mode][count].push(socket.id)
             });
         });
 
-        // Push to actual client socket to waitingClient list for future usage
         waitingClientIds.push(socket.id);
 
-        // Go through all the waiting clients and count how many players left until start for each gametype
         updatePlayersUntilStartForWaitingClients();
     });
 
@@ -96,8 +53,48 @@ io.on("connection", (socket: SocketIO.Socket) => {
         console.log("Client " + socket.id + " disconnected.");
         if (waitingClientIds.includes(socket.id))
             waitingClientIds.splice(waitingClientIds.indexOf(socket.id), 1);
-        waitingClientIds.forEach(waitingClientIds => io.to(waitingClientIds).emit('playersUntilStart', -1));
     });
 });
 
-server.listen(port, () => console.log(`Server up on port ${port}`));
+
+const updatePlayersUntilStartForWaitingClients = () => {
+    const playersUntilStartForEachGame = getPlayersUntilStartForEachGame(clientIdQueuedGameTypes);
+    const readyGameType = getFirstReadyGameType(playersUntilStartForEachGame);
+    let newRoomCreated = false;
+    let clientsInNewRoom: string[] = [];
+    [...waitingClientIds].forEach(waitingClientId => {
+        if (readyGameType) {
+            startGame(waitingClientId, readyGameType);
+            clientsInNewRoom.push(waitingClientId);
+            newRoomCreated = true;
+        } else {
+            io.to(waitingClientId).emit('playersUntilStart', playersUntilStartForEachGame);
+        }
+    });
+    if (newRoomCreated) {
+        rooms.push(clientsInNewRoom);
+        clientsInNewRoom = [];
+        newRoomCreated = false;
+    }
+};
+
+
+const startGame = (clientId: string, readyGameType: string) => {
+    console.log(`Emitting to ${clientId} that their ${readyGameType}-room is ${rooms.length + 1}.`);
+    io.to(clientId).emit('startGame', {mode: readyGameType, room: rooms.length + 1});
+    removeClientFromWaiting(clientId);
+};
+
+const removeClientFromWaiting = (socketId: string) => {
+    waitingClientIds.splice(waitingClientIds.indexOf(socketId), 1);
+    possibleGameModes.forEach(mode => {
+        possiblePlayerAmounts.forEach(amt => {
+            const indexOfDisconnectingClient = clientIdQueuedGameTypes[mode][amt].indexOf(socketId);
+            if (indexOfDisconnectingClient !== -1)
+                clientIdQueuedGameTypes[mode][amt].splice(indexOfDisconnectingClient, 1);
+        })
+    });
+};
+
+
+

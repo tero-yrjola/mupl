@@ -12,7 +12,7 @@ function SMChat({ gameRoom, socket}: SMChatProps): JSX.Element {
 
     useEffect(() => {
         socket.on('updateText', (text: string) => setText(text));
-    }, []);
+    }, [socket]);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -23,7 +23,7 @@ function SMChat({ gameRoom, socket}: SMChatProps): JSX.Element {
     };
 
     return (
-        <div className="App">
+        <div>
             <p>You are in room {gameRoom} </p>
             <form autoComplete="off" onSubmit={handleSubmit}>
                 <input
