@@ -42,25 +42,30 @@ function Lobby({queueInfo, connect}: LobbyProps) {
         <div className="lobby-container">
             {searching ? (
                 <div className="lobby">
-                    <h2>Selected game modes:</h2>
                     <div>
-                        {queueInfo.length > 0 && filteredGameTypes(queueInfo).map(modeInfo =>
-                            <div className="normal-text" key={modeInfo.name}>
-                                <p>{modeInfo.name}</p>
-                                <table className="queue-info-table">
-                                    <thead>
-                                    <td># of players</td>
-                                    <td>Players until start</td>
-                                    </thead>
-                                    {modeInfo.playersUntilStart.map((playerCounts =>
-                                            <tr>
-                                                <td>{playerCounts.amount}</td>
-                                                <td>{playerCounts.playersUntilStart}</td>
-                                            </tr>
-                                    ))}
-                                </table>
-                            </div>
-                        )}
+                        {queueInfo.length > 0
+                            ?
+                            <>
+                                <h2>Selected game modes:</h2>
+                                {filteredGameTypes(queueInfo).map(modeInfo =>
+                                    <div className="normal-text" key={modeInfo.name}>
+                                        <p>{modeInfo.name}</p>
+                                        <table className="queue-info-table">
+                                            <thead>
+                                            <td># of players</td>
+                                            <td>Players until start</td>
+                                            </thead>
+                                            {modeInfo.playersUntilStart.map((playerCounts =>
+                                                    <tr>
+                                                        <td>{playerCounts.amount}</td>
+                                                        <td>{playerCounts.playersUntilStart}</td>
+                                                    </tr>
+                                            ))}
+                                        </table>
+                                    </div>
+                                )}
+                            </>
+                            : <p className="normal-text">Loading...</p>}
                     </div>
                 </div>
             ) : (
