@@ -1,5 +1,5 @@
 type PlayerAmounts = {
-    [amountOfPlayers: string]: string[]
+    [amountOfPlayers: string]: string[];
 };
 
 export type AllGameTypes = {
@@ -17,24 +17,28 @@ export const getAllPossibleGameModes = (gameModes: string[], playerAmounts: numb
 
 export const getPlayersUntilStartForEachGame = (queuedGameTypesForEachClient: AllGameTypes) => {
     const gameModes = Object.keys(queuedGameTypesForEachClient);
-    return gameModes.map(mode => {
-        const playerAmounts = Object.keys(queuedGameTypesForEachClient[mode]).map(amt => parseInt(amt));
-        const playersUntilStart = playerAmounts.map(amount => {
-            return {amount, playersUntilStart: (amount - queuedGameTypesForEachClient[mode][amount].length)}
+    return gameModes.map((mode) => {
+        const playerAmounts = Object.keys(queuedGameTypesForEachClient[mode]).map((amt) => parseInt(amt));
+        const playersUntilStart = playerAmounts.map((amount) => {
+            return { amount, playersUntilStart: amount - queuedGameTypesForEachClient[mode][amount].length };
         });
-        return {name: mode, playersUntilStart}
+        return { name: mode, playersUntilStart };
     });
 };
 
-export const getFirstReadyGameType = (playersUntilStartForEachGame:
-   { name: string; playersUntilStart: { amount: number; playersUntilStart: number }[] }[]) => {
+export const getFirstReadyGameType = (
+    playersUntilStartForEachGame: {
+        name: string;
+        playersUntilStart: { amount: number; playersUntilStart: number }[];
+    }[],
+) => {
     let readyGameType = '';
-    playersUntilStartForEachGame.forEach(modeQueueInfo => {
-        modeQueueInfo.playersUntilStart.forEach((playerAmount: { playersUntilStart: number; }) => {
+    playersUntilStartForEachGame.forEach((modeQueueInfo) => {
+        modeQueueInfo.playersUntilStart.forEach((playerAmount: { playersUntilStart: number }) => {
             if (playerAmount.playersUntilStart === 0) {
-                readyGameType = modeQueueInfo.name
+                readyGameType = modeQueueInfo.name;
             }
-        })
+        });
     });
-    return readyGameType
+    return readyGameType;
 };

@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {QueueInfo, SelectedGameModes} from '../App';
+import React, { useState } from 'react';
+import { QueueInfo, SelectedGameModes } from '../App';
 import './Lobby.css';
 
 const gameModes = ['singleMessageChat'];
@@ -10,7 +10,7 @@ interface LobbyProps {
     queueInfo: QueueInfo;
 }
 
-function Lobby({queueInfo, connect}: LobbyProps) {
+function Lobby({ queueInfo, connect }: LobbyProps) {
     const [searching, setSearching] = useState(false);
     const [selectedGameModes, setSelectedGameModes] = useState<string[]>([...gameModes]);
     const [selectedPlayerCounts, setSelectedPlayerCounts] = useState<number[]>([...playerCounts]);
@@ -18,7 +18,7 @@ function Lobby({queueInfo, connect}: LobbyProps) {
     const search = () => {
         if (selectedGameModes.length > 0 && selectedPlayerCounts.length > 0) {
             setSearching(true);
-            connect({playerCounts: selectedPlayerCounts, gameModes: selectedGameModes});
+            connect({ playerCounts: selectedPlayerCounts, gameModes: selectedGameModes });
         } else alert('Please pick at least one game mode and one amount of players.');
     };
 
@@ -27,15 +27,16 @@ function Lobby({queueInfo, connect}: LobbyProps) {
     }
 
     const filteredGameTypes = (queueInfo: QueueInfo) => {
-        return queueInfo.filter(mode => selectedGameModes.includes(mode.name))
-            .map(gameType => {
+        return queueInfo
+            .filter((mode) => selectedGameModes.includes(mode.name))
+            .map((gameType) => {
                 return {
                     name: gameType.name,
-                    playersUntilStart: gameType.playersUntilStart
-                        .filter(gameAmt => selectedPlayerCounts
-                            .includes(gameAmt.amount))
-                }
-            })
+                    playersUntilStart: gameType.playersUntilStart.filter((gameAmt) =>
+                        selectedPlayerCounts.includes(gameAmt.amount),
+                    ),
+                };
+            });
     };
 
     return (
@@ -43,29 +44,30 @@ function Lobby({queueInfo, connect}: LobbyProps) {
             {searching ? (
                 <div className="lobby">
                     <div>
-                        {queueInfo.length > 0
-                            ?
+                        {queueInfo.length > 0 ? (
                             <>
                                 <h2>Selected game modes:</h2>
-                                {filteredGameTypes(queueInfo).map(modeInfo =>
+                                {filteredGameTypes(queueInfo).map((modeInfo) => (
                                     <div className="normal-text" key={modeInfo.name}>
                                         <p>{modeInfo.name}</p>
                                         <table className="queue-info-table">
                                             <thead>
-                                            <td># of players</td>
-                                            <td>Players until start</td>
+                                                <td># of players</td>
+                                                <td>Players until start</td>
                                             </thead>
-                                            {modeInfo.playersUntilStart.map((playerCounts =>
-                                                    <tr>
-                                                        <td>{playerCounts.amount}</td>
-                                                        <td>{playerCounts.playersUntilStart}</td>
-                                                    </tr>
+                                            {modeInfo.playersUntilStart.map((playerCounts) => (
+                                                <tr>
+                                                    <td>{playerCounts.amount}</td>
+                                                    <td>{playerCounts.playersUntilStart}</td>
+                                                </tr>
                                             ))}
                                         </table>
                                     </div>
-                                )}
+                                ))}
                             </>
-                            : <p className="normal-text">Loading...</p>}
+                        ) : (
+                            <p className="normal-text">Loading...</p>
+                        )}
                     </div>
                 </div>
             ) : (
@@ -79,8 +81,11 @@ function Lobby({queueInfo, connect}: LobbyProps) {
                                 }}
                                 key={mode}
                             >
-                                <input type="checkbox" onChange={() => null}
-                                       checked={selectedGameModes.includes(mode)}/>
+                                <input
+                                    type="checkbox"
+                                    onChange={() => null}
+                                    checked={selectedGameModes.includes(mode)}
+                                />
                                 <span className="normal-text">{mode.replace(/([A-Z])/g, ' $1')}</span>
                             </div>
                         ))}
@@ -95,16 +100,20 @@ function Lobby({queueInfo, connect}: LobbyProps) {
                                 }}
                                 key={count}
                             >
-                                <input type="checkBox" onChange={() => null}
-                                       checked={selectedPlayerCounts.includes(count)}/>
+                                <input
+                                    type="checkBox"
+                                    onChange={() => null}
+                                    checked={selectedPlayerCounts.includes(count)}
+                                />
                                 <div className="amount-checkbox-label normal-text">{count}</div>
                             </div>
                         ))}
                     </div>
-                    <input className="submit-btn" type="button" value="Search" onClick={search}/>
+                    <input className="submit-btn" type="button" value="Search" onClick={search} />
                 </div>
             )}
-        </div>);
+        </div>
+    );
 }
 
 export default Lobby;

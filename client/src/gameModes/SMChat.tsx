@@ -2,10 +2,10 @@ import React, { FormEvent, useState, useEffect } from 'react';
 
 interface SMChatProps {
     gameRoom: number;
-    socket: SocketIOClient.Socket
+    socket: SocketIOClient.Socket;
 }
 
-function SMChat({ gameRoom, socket}: SMChatProps): JSX.Element {
+function SMChat({ gameRoom, socket }: SMChatProps): JSX.Element {
     const [text, setText] = useState('');
     const [localText, setLocalText] = useState('');
     const [messageCooldown, setMessageCooldown] = useState(false);
